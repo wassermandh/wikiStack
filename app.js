@@ -19,16 +19,14 @@ db.authenticate().then(() => {
   console.log('connected to the db');
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use('/wiki', wikiRoute);
 app.use('/user', userRoute);
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
-
-/* app.get('/', (req, res, next) => {
-  res.send(main());
-}); */
 
 app.get('/', (req, res, next) => {
   res.send(main());
