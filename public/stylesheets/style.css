@@ -6,3 +6,16 @@ body {
 a {
   color: #00b7ff;
 }
+
+input {
+  width: 100px;
+}
+
+.bigFlex {
+  display: flex;
+  flex-direction: column;
+}
+
+#pageContent {
+  height: 100px;
+}
