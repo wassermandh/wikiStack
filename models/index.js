@@ -21,6 +21,10 @@ const Page = db.define('page', {
   },
 });
 
+Page.beforeValidate(pageIntstance => {
+  pageIntstance.slug = createSlug(pageIntstance.title);
+});
+
 const User = db.define('user', {
   name: {
     type: Sequelize.STRING,
@@ -35,8 +39,31 @@ const User = db.define('user', {
   },
 });
 
+Page.belongsTo(User, { as: 'Author' });
+
 module.exports = {
   Page,
   User,
   db,
 };
+
+function createSlug(title) {
+  if (!title) {
+    return slugGenerator(10);
+  }
+
+  return title.replace(/ /g, '_').replace(/\W/g, '');
+}
+
+function slugGenerator(length) {
+  let result = '';
+  let characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (let i = 0; i < length; i++) {
+    let idx = Math.floor(Math.random() * characters.length);
+    result += characters[idx];
+  }
+
+  return result;
+}

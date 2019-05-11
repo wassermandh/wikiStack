@@ -12,7 +12,12 @@ module.exports = pages =>
     <hr />
     <ul class="list-unstyled">
       <ul>
-        <!-- PLACEHOLDER LIST OF PAGES -->
+        ${pages.map(
+          ele =>
+            html`
+              <li><a href="/wiki/${ele.slug}">${ele.title}</a></li>
+            `
+        )}
       </ul>
     </ul>
   `);

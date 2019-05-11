@@ -1,30 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const addPage = require('../views/addPage');
+const wikiPage = require('../views/wikipage');
+const main = require('../views/main');
 const { db, User, Page } = require('../models/index');
 
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   res.redirect('/');
 });
 
 router.post('/', async (req, res, next) => {
-  const title = req.body.title;
-  const content = req.body.pageContent;
-  const status = req.body.pageStatus;
-  const slug = createSlug(title)
-    .split(' ')
-    .join('_');
-
-  const page = new Page({
-    title,
-    content,
-    status,
-    slug,
-  });
-
   try {
-    await page.save();
-    res.redirect('/');
+    const page = await Page.create({
+      title: req.body.title,
+      content: req.body.pageContent,
+      status: req.body.pageStatus,
+    });
+
+    const [user, wasCreated] = await User.findOrCreate({
+      where: {
+        name: req.body.authorName,
+        email: req.body.authorEmail,
+      },
+    });
+    page.setAuthor(user);
+    res.redirect(`/wiki/${page.slug}`);
   } catch (error) {
     next(error);
   }
@@ -34,25 +34,18 @@ router.get('/add', (req, res, next) => {
   res.send(addPage());
 });
 
+router.get('/:slug', async (req, res, next) => {
+  try {
+    const page = await Page.findOne({
+      where: {
+        slug: req.params.slug,
+      },
+    });
+    const author = await page.getAuthor();
+    res.send(wikiPage(page, author));
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
-
-function createSlug(title) {
-  if (!title) {
-    return slugGenerator(10);
-  }
-
-  return title.replace(/\W/g, '');
-}
-
-function slugGenerator(length) {
-  let result = '';
-  let characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for (let i = 0; i < length; i++) {
-    let idx = Math.floor(Math.random() * characters.length);
-    result += characters[idx];
-  }
-
-  return result;
-}

@@ -5,7 +5,7 @@ module.exports = () =>
   layout(html`
     <h3>Add a Page</h3>
     <hr />
-    <form method="POST" action="/wiki/">
+    <form method="POST" action="/wiki">
       <div class="bigFlex">
         <div class="form-group">
           <label for="authorName" class="col-sm-2 control-label"
@@ -59,12 +59,10 @@ module.exports = () =>
             >Page Status</label
           >
           <div class="col-sm-10">
-            <input
-              id="pageStatus"
-              name="pageStatus"
-              type="text"
-              class="form-control"
-            />
+            <select id="pageStatus" name="pageStatus">
+              <option value="open">open</option>
+              <option value="closed">closed</option>
+            </select>
           </div>
         </div>
       </div>

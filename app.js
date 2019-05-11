@@ -11,7 +11,7 @@ const {
   userPages,
   wikipage,
 } = require('./views');
-const { db } = require('./models/index');
+const { db, Page } = require('./models/index');
 const userRoute = require('./routes/user');
 const wikiRoute = require('./routes/wiki');
 
@@ -22,18 +22,19 @@ db.authenticate().then(() => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/wiki', wikiRoute);
-app.use('/user', userRoute);
+app.use('/users', userRoute);
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 
-app.get('/', (req, res, next) => {
-  res.send(main());
+app.get('/', async (req, res, next) => {
+  const allPages = await Page.findAll();
+  res.send(main(allPages));
 });
 
 async function syncModels() {
-  await db.sync({ force: true });
+  await db.sync();
 }
 
 app.listen(3000, () => {
